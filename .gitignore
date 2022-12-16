@@ -3,6 +3,7 @@
 
 # Visual Studio
 .vs/
+.vscode/
 
 # JetBrains Rider
 .idea/
