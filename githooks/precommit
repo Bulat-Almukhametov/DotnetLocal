@@ -1,0 +1,25 @@
+#!/bin/sh
+CHANGED_CS_FILES=$(git diff --cached --name-only --diff-filter=ACMR | grep ".cs\$")
+
+if [ -z "$CHANGED_CS_FILES" ]
+then
+   echo "No C# files were found. No reason to run cleanup."
+   exit 0
+fi
+
+SLN_FILE=$(ls | grep ".sln\$")
+CLEANUP_CS_FILES=$(git diff --cached --name-only --diff-filter=ACMR | grep ".cs\$" | xargs -I % echo **% | paste -s -d';')
+
+dotnet tool restore
+dotnet jb cleanupcode --profile="Csharp Cleanup" --include="$CLEANUP_CS_FILES" "$SLN_FILE"
+
+FILES_AFTER_CLEANUP=$(git diff --name-only $CHANGED_CS_FILES | paste -s -d',')
+if [ -n "$FILES_AFTER_CLEANUP" ]
+then
+   echo "C# files need to be formatted: $FILES_AFTER_CLEANUP."
+   echo "If you want to ignore formatting add in your code:"
+   echo "// @formatter:off"
+   echo "..."
+   echo "// @formatter:on"
+   exit 1
+fi

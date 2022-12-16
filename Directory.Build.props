@@ -1,0 +1,5 @@
+<Project>
+    <Target Name="PreBuild" BeforeTargets="PreBuildEvent" Condition="'$(Configuration)'=='Debug'">
+        <Exec Command="git config core.hooksPath githooks" />
+    </Target>
+</Project>
